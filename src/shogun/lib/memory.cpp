@@ -78,13 +78,12 @@ void MemoryBlock::set_sgobject()
 }
 #endif
 
+#ifdef TRACE_MEMORY_ALLOCS
 void* operator new(size_t size) throw (std::bad_alloc)
 {
 	void *p=malloc(size);
-#ifdef TRACE_MEMORY_ALLOCS
 	if (sg_mallocs)
 		sg_mallocs->add(p, MemoryBlock(p,size));
-#endif
 	if (!p)
 	{
 		const size_t buf_len=128;
@@ -102,20 +101,16 @@ void* operator new(size_t size) throw (std::bad_alloc)
 
 void operator delete(void *p) throw()
 {
-#ifdef TRACE_MEMORY_ALLOCS
 	if (sg_mallocs)
 		sg_mallocs->remove(p);
-#endif
 	free(p);
 }
 
 void* operator new[](size_t size) throw(std::bad_alloc)
 {
 	void *p=malloc(size);
-#ifdef TRACE_MEMORY_ALLOCS
 	if (sg_mallocs)
 		sg_mallocs->add(p, MemoryBlock(p,size));
-#endif
 
 	if (!p)
 	{
@@ -134,12 +129,12 @@ void* operator new[](size_t size) throw(std::bad_alloc)
 
 void operator delete[](void *p) throw()
 {
-#ifdef TRACE_MEMORY_ALLOCS
 	if (sg_mallocs)
 		sg_mallocs->remove(p);
-#endif
 	free(p);
 }
+
+#endif /* TRACE_MEMORY_ALLOCS */
 
 void* sg_malloc(size_t size
 #ifdef TRACE_MEMORY_ALLOCS
